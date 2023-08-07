@@ -3,6 +3,7 @@
     --calculator: #f8f9fa;
     --calculator-screen: #FFFFFF;
     --operator-button: #f6e8ff;
+    --operator-button-shadow: #59189a3a;
     --operator-text: #5a189a;
 }
 
@@ -32,6 +33,7 @@ body {
     flex-direction: column;
     background-color: var(--calculator-screen);
     border-radius: 30px;
+    box-shadow: -5px 5px 10px #AAAAAA;
 }
 
 .display {
@@ -95,4 +97,5 @@ body {
 .input.operator {
     background-color: var(--operator-button);
     color: var(--operator-text);
+    box-shadow: -5px 5px 5px var(--operator-button-shadow);
 }
