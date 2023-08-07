@@ -3,3 +3,79 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: grey;
+    font-family: sans-serif, Arial, Helvetica;
+}
+
+.calculator {
+    height: 90vh;
+    aspect-ratio: 9 / 16;
+    display: flex;
+    flex-direction: column;
+    background-color: antiquewhite;
+}
+
+.display {
+    width: 100%;
+    padding: 0 5%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: beige;
+}
+
+.display.result {
+    height: 10%;
+}
+
+.display.expression {
+    height: 20%;
+}
+
+.inputs {
+    /* Fill in the rest of the height */
+    flex: 1;
+    width: 100%;
+    padding: 5%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    background-color: blanchedalmond;
+}
+
+.input-container {
+    /* 4 buttons per row */
+    width: 25%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input {
+    width: 90%;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+
+    background-color: black;
+    color: white;
+
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
