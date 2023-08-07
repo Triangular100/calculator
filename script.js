@@ -44,6 +44,30 @@ function appendPeriod(e) {
     console.log(e.target.textContent);
 }
 
+function processPressedKey(e) {
+    if (Number.isInteger(Number(e.key))) {
+        console.log(Number(e.key));
+    } else if (e.key === "Backspace") {
+        console.log(e.key);
+    } else if (e.key === "%") {
+        console.log(e.key);
+    } else if (e.key === "^") {
+        console.log(e.key);
+    } else if (e.key === "/") {
+        console.log(e.key);
+    } else if (e.key === "*") {
+        console.log(e.key);
+    } else if (e.key === "-") {
+        console.log(e.key);
+    } else if (e.key === "+") {
+        console.log(e.key);
+    } else if (e.key === "=") {
+        console.log(e.key);
+    } else if (e.key === ".") {
+        console.log(e.key);
+    }
+}
+
 const numberButtons = document.querySelectorAll(".number");
 const resetButton = document.querySelector("#reset");
 const backspaceButton = document.querySelector("#backspace");
@@ -67,3 +91,5 @@ subtractButton.addEventListener("click", subtract);
 addButton.addEventListener("click", add);
 equalButton.addEventListener("click", calculate);
 periodButton.addEventListener("click", appendPeriod);
+
+window.addEventListener("keydown", processPressedKey);
