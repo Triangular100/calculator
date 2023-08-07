@@ -1,52 +1,91 @@
-
-function appendNumber(e) {
-    let integer = Number(e.target.textContent);
-    console.log(integer);
+function getCurrentNumber() {
+    if (currentExpression === "") {
+        return "";
+    }
+    if (Number.isFinite(Number(currentExpression))) {
+        return currentExpression;
+    }
+    // Match to last number if it exists
+    let lastNumber = currentExpression.match(/\d+[.]?\d*$/);
+    if (lastNumber) {
+        return lastNumber[0];
+    }
+    return "";
 }
 
-function reset(e) {
+function validNumberAppend(value) {
+    if (Number(value) > 0) {
+        return true;
+    }
+    let currentNumber = getCurrentNumber();
+    if (currentNumber === "0" && value === "0") {
+        return false;
+    }
+    return true;
+}
+
+function appendNumber(value) {
+    if (!validNumberAppend(value)) {
+        return;
+    }
+    if (currentExpression === "0") {
+        currentExpression = "";
+    }
+    currentExpression += value;
+    expressionDisplay.textContent = currentExpression;
+}
+
+function pressNumber(e) {
+    appendNumber(e.target.textContent);
+    calculate();
+}
+
+function pressReset() {
+    resultDisplay.textContent = "";
+    expressionDisplay.textContent = "";
+    currentExpression = "";
+}
+
+function pressBackspace(e) {
     console.log(e.target.textContent);
 }
 
-function backspace(e) {
+function pressMod(e) {
     console.log(e.target.textContent);
 }
 
-function mod(e) {
+function pressExponent(e) {
     console.log(e.target.textContent);
 }
 
-function exponentiate(e) {
+function pressDivide(e) {
     console.log(e.target.textContent);
 }
 
-function divide(e) {
+function pressMultiply(e) {
     console.log(e.target.textContent);
 }
 
-function multiply(e) {
+function pressSubtract(e) {
     console.log(e.target.textContent);
 }
 
-function subtract(e) {
+function pressAdd(e) {
     console.log(e.target.textContent);
 }
 
-function add(e) {
+function pressCalculate(e) {
     console.log(e.target.textContent);
 }
 
-function calculate(e) {
+function pressPeriod(e) {
     console.log(e.target.textContent);
 }
 
-function appendPeriod(e) {
-    console.log(e.target.textContent);
-}
-
-function processPressedKey(e) {
+function processKey(e) {
     if (Number.isInteger(Number(e.key))) {
-        console.log(Number(e.key));
+        appendNumber(e.key);
+        calculate();
     } else if (e.key === "Backspace") {
         console.log(e.key);
     } else if (e.key === "%") {
@@ -68,6 +107,12 @@ function processPressedKey(e) {
     }
 }
 
+function calculate() {
+    resultDisplay.textContent = currentExpression;
+}
+
+let currentExpression = "";
+
 const numberButtons = document.querySelectorAll(".number");
 const resetButton = document.querySelector("#reset");
 const backspaceButton = document.querySelector("#backspace");
@@ -79,17 +124,19 @@ const subtractButton = document.querySelector("#subtract");
 const addButton = document.querySelector("#add");
 const equalButton = document.querySelector("#equal");
 const periodButton = document.querySelector("#period");
+const resultDisplay = document.querySelector(".result");
+const expressionDisplay = document.querySelector(".expression");
 
-numberButtons.forEach(number => number.addEventListener("click", appendNumber));
-resetButton.addEventListener("click", reset);
-backspaceButton.addEventListener("click", backspace);
-modButton.addEventListener("click", mod);
-exponentButton.addEventListener("click", exponentiate);
-divideButton.addEventListener("click", divide);
-multiplyButton.addEventListener("click", multiply);
-subtractButton.addEventListener("click", subtract);
-addButton.addEventListener("click", add);
-equalButton.addEventListener("click", calculate);
-periodButton.addEventListener("click", appendPeriod);
+numberButtons.forEach(number => number.addEventListener("click", pressNumber));
+resetButton.addEventListener("click", pressReset);
+backspaceButton.addEventListener("click", pressBackspace);
+modButton.addEventListener("click", pressMod);
+exponentButton.addEventListener("click", pressExponent);
+divideButton.addEventListener("click", pressDivide);
+multiplyButton.addEventListener("click", pressMultiply);
+subtractButton.addEventListener("click", pressSubtract);
+addButton.addEventListener("click", pressAdd);
+equalButton.addEventListener("click", pressCalculate);
+periodButton.addEventListener("click", pressPeriod);
 
-window.addEventListener("keydown", processPressedKey);
+window.addEventListener("keydown", processKey);
