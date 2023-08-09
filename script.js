@@ -1,12 +1,5 @@
-function pressReset() {
-    resultDisplay.textContent = "";
-    expressionDisplay.textContent = "";
-    currentExpression = "";
-}
-
 function pressNumber(e) {
     appendNumber(e.target.textContent);
-    drawDisplay();
 }
 
 function appendNumber(value) {
@@ -14,10 +7,11 @@ function appendNumber(value) {
         return;
     }
     if (existsLastNumber() === "0") {
-        currentExpression - removeLastDigit(currentExpression);
+        currentExpression = removeLastDigit(currentExpression);
     }
     currentExpression += value;
     result = calculateExpression(currentExpression);
+    drawDisplay();
 }
 
 function validNumberAppend(value) {
@@ -47,63 +41,9 @@ function existsLastNumber() {
     return "";
 }
 
-function pressBackspace(e) {
-    backspace();
-}
-
-function backspace() {
-    if (currentExpression === "") {
-        return;
-    }
-    // Either at a number or operator
-    if (existsLastNumber()) {
-        currentExpression = removeLastDigit(currentExpression);
-    } else {
-        currentExpression = removeLastOperator(currentExpression);
-    }
-    if (existsLastOperator()) {
-        result = calculateExpression(removeLastOperator(currentExpression));
-    } else {
-        let lastNumber = existsLastNumber();
-        if (lastNumber === ".") {
-            result = calculateExpression(removeLastOperator(removeLastDigit(currentExpression)));
-        } else {
-            result = calculateExpression(currentExpression);
-        }
-    }
-    drawDisplay();
-}
-
-function removeLastDigit(expression) {
-    return expression.substring(0, expression.length - 1);
-}
-
-function removeLastOperator(expression) {
-    return expression.substring(0, expression.length - 3);
-}
-
-function pressMod(e) {
-    appendOperator("%");
-}
-
-function pressExponent(e) {
-    appendOperator("^");
-}
-
-function pressDivide(e) {
-    appendOperator("/");
-}
-
-function pressMultiply(e) {
-    appendOperator("*");
-}
-
-function pressSubtract(e) {
-    appendOperator("-");
-}
-
-function pressAdd(e) {
-    appendOperator("+");
+function pressOperate(e) {
+    let operator = e.target.getAttribute("data-value");
+    appendOperator(operator);
 }
 
 function appendOperator(operator) {
@@ -115,20 +55,21 @@ function appendOperator(operator) {
     if (currentExpression === "") {
         return;
     }
-    // Negative number needs digits (don't operate on negative sign)
+    // don't operate on negative sign
     if (currentExpression === "-") {
         return;
     }
-    if (existsLastOperator() === operator) {
+    let lastOperator = existsLastOperator();
+    if (lastOperator === operator) {
         return;
     }
-    // Floating point number needs digits (don't allow operation on .)
+    // don't operate on . (needs more digits)
     let lastNumber = existsLastNumber();
     if (lastNumber === ".") {
         return;
     }
     // replace operator
-    if (currentExpression !== "" && lastNumber === "") {
+    if (lastOperator) {
         currentExpression = removeLastOperator(currentExpression);
     }
     result = calculateExpression(currentExpression);
@@ -141,66 +82,92 @@ function existsLastOperator() {
     if (currentExpression === "") {
         return "";
     }
-    if (existsLastNumber() !== "") {
+    if (existsLastNumber()) {
         return "";
     }
     return currentExpression[currentExpression.length - 2];
 }
 
-function pressCalculate(e) {
+function pressReset() {
+    currentExpression = "";
+    result = "";
+    drawDisplay();
+}
+
+function backspace() {
+    if (currentExpression === "") {
+        return;
+    }
+    // Either at a number or operator
+    let lastNumber = existsLastNumber();
+    if (lastNumber) {
+        currentExpression = removeLastDigit(currentExpression);
+        updateResult();
+    } else {
+        currentExpression = removeLastOperator(currentExpression);
+    }
+    drawDisplay();
+}
+
+function removeLastDigit(expression) {
+    return expression.substring(0, expression.length - 1);
+}
+
+function removeLastOperator(expression) {
+    return expression.substring(0, expression.length - 3);
+}
+
+function updateResult() {
+    if (currentExpression === "") {
+        result = "";
+        return;
+    }
+    lastNumber = existsLastNumber();
+    if (lastNumber === ".") {
+        // Remove the period and the operator before it
+        result = calculateExpression(removeLastOperator(removeLastDigit(currentExpression)));
+        return;
+    }
+    if (lastNumber) {
+        result = calculateExpression(currentExpression);
+        return;
+    }
+    // no last number means there's an operator
+    result = calculateExpression(removeLastOperator(currentExpression));
+}
+
+function calculate() {
     let lastNumber = existsLastNumber();
     if (lastNumber === "" || lastNumber === ".") {
         return;
     }
     result = "";
     currentExpression = calculateExpression(currentExpression);
+    currentExpression = truncate(currentExpression);
     drawDisplay();
 }
 
-function pressPeriod(e) {
-    addPeriod();
+function truncate(expression) {
+    let limit = 15;
+    if (expression.length < limit) {
+        return expression;
+    }
+    if (currentExpression.includes("e")) {
+        let exponent = currentExpression.substring(currentExpression.indexOf("e"));
+        let left = limit - exponent.length;
+        currentExpression = currentExpression.substring(0, left) + exponent;
+        return currentExpression;
+    }
+
+    return currentExpression.substring(0, 15);
 }
 
 function addPeriod() {
-    let lastNumber = existsLastNumber();
-    if (lastNumber.includes(".")) {
+    if (existsLastNumber().includes(".")) {
         return;
     }
     currentExpression += ".";
     drawDisplay();
-}
-
-function processKey(e) {
-    if (e.key === " ") {
-        return;
-    } else if (Number.isInteger(Number(e.key))) {
-        appendNumber(e.key);
-        drawDisplay();
-    } else if (e.key === "Backspace") {
-        backspace();
-    } else if (e.key === "%") {
-        appendOperator("%");
-        drawDisplay();
-    } else if (e.key === "^") {
-        appendOperator("^");
-        drawDisplay();
-    } else if (e.key === "/") {
-        appendOperator("/");
-        drawDisplay();
-    } else if (e.key === "*") {
-        appendOperator("*");
-        drawDisplay();
-    } else if (e.key === "-") {
-        appendOperator("-");
-        drawDisplay();
-    } else if (e.key === "+") {
-        appendOperator("+");
-        drawDisplay();
-    } else if (e.key === "Enter") {
-        pressCalculate();
-    } else if (e.key === ".") {
-        addPeriod();
-    }
 }
 
 function drawDisplay() {
@@ -209,25 +176,24 @@ function drawDisplay() {
 }
 
 function calculateExpression(expression) {
-    if (expression === "" || expression === "-") {
+    if (expression === "" || expression === "-" || expression === ".") {
         return "";
     }
     // Precedence: exponent, (multiplication, division, modulus), (add, subtract)
     while (expression.includes("^")) {
-        expression = simplifyOn(expression, "^");
+        expression = simplifyFirst(expression, "^");
     }
     while (expression.includes("*") || expression.includes("/") || expression.includes("%")) {
         let operator = identifyFirstOperator(expression, ["*", "/", "%"]);
-        expression = simplifyOn(expression, operator);
+        expression = simplifyFirst(expression, operator);
     }
     while (expression.includes("+") || expression.includes("-")) {
         if (Number.isFinite(Number(expression))) {
-            // expression can be negative, like -3
-            break;
+            break;  // expression can be negative, like -3
         }
         // remove first digit to account for possibility of first number negative
         let operator = identifyFirstOperator(expression.substring(1), ["+", "-"]);
-        expression = simplifyOn(expression, operator);
+        expression = simplifyFirst(expression, operator);
     }
     return String(Number(expression));
 }
@@ -245,9 +211,9 @@ function identifyFirstOperator(expression, operators) {
     return first;
 }
 
-function simplifyOn(expression, operator) {
-    let subterms = getFirstSubterms(expression, operator);
-    let [num1, num2] = getNumbers(subterms, operator);
+function simplifyFirst(expression, operator) {
+    let subterms = parseFirstSubterms(expression, operator);
+    let [num1, num2] = parseNumbers(subterms, operator);
     let output = "";
     if (operator === "+") {
         output = num1 + num2;
@@ -265,7 +231,7 @@ function simplifyOn(expression, operator) {
     return expression.replace(subterms, output);
 }
 
-function getFirstSubterms(expression, operator) {
+function parseFirstSubterms(expression, operator) {
     // Account for negative sign if operator is a minus
     let minus = "";
     if (operator === "-" && expression[0] === "-") {
@@ -273,7 +239,7 @@ function getFirstSubterms(expression, operator) {
         minus = "-";
     }
 
-    // Format always has a space on each side of the operator
+    // Operator always has a space on each side
     let index = expression.indexOf(operator);
     let leftIndex = index - 2;
     let rightIndex = index + 2;
@@ -289,38 +255,49 @@ function getFirstSubterms(expression, operator) {
 }
 
 
-function getNumbers(expression, operator) {
+function parseNumbers(expression, operator) {
     let [num1, num2] = expression.split(` ${operator} `);
     return [Number(num1), Number(num2)];
+}
+
+function processKey(e) {
+    if (e.key === " ") {
+        return;
+    } else if (Number.isInteger(Number(e.key))) {
+        appendNumber(e.key);
+    } else if (e.key === "Backspace") {
+        backspace();
+    } else if (e.key === "%" ||
+        (e.key === "^") ||
+        (e.key === "/") ||
+        (e.key === "*") ||
+        (e.key === "-") ||
+        (e.key === "+")) {
+        appendOperator(e.key);
+    } else if (e.key === "Enter") {
+        calculate();
+    } else if (e.key === ".") {
+        addPeriod();
+    }
 }
 
 let result = "";
 let currentExpression = "";
 
 const numberButtons = document.querySelectorAll(".number");
+const operateButtons = document.querySelectorAll(".operate");
 const resetButton = document.querySelector("#reset");
 const backspaceButton = document.querySelector("#backspace");
-const modButton = document.querySelector("#mod");
-const exponentButton = document.querySelector("#exponent");
-const divideButton = document.querySelector("#divide");
-const multiplyButton = document.querySelector("#multiply");
-const subtractButton = document.querySelector("#subtract");
-const addButton = document.querySelector("#add");
 const equalButton = document.querySelector("#equal");
 const periodButton = document.querySelector("#period");
 const resultDisplay = document.querySelector(".result");
 const expressionDisplay = document.querySelector(".expression");
 
-numberButtons.forEach(number => number.addEventListener("click", pressNumber));
+numberButtons.forEach(button => button.addEventListener("click", pressNumber));
+operateButtons.forEach(button => button.addEventListener("click", pressOperate));
 resetButton.addEventListener("click", pressReset);
-backspaceButton.addEventListener("click", pressBackspace);
-modButton.addEventListener("click", pressMod);
-exponentButton.addEventListener("click", pressExponent);
-divideButton.addEventListener("click", pressDivide);
-multiplyButton.addEventListener("click", pressMultiply);
-subtractButton.addEventListener("click", pressSubtract);
-addButton.addEventListener("click", pressAdd);
-equalButton.addEventListener("click", pressCalculate);
-periodButton.addEventListener("click", pressPeriod);
+backspaceButton.addEventListener("click", backspace);
+equalButton.addEventListener("click", calculate);
+periodButton.addEventListener("click", addPeriod);
 
 window.addEventListener("keydown", processKey);
