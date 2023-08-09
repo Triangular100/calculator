@@ -27,7 +27,7 @@ body {
 }
 
 .calculator {
-    height: 97vh;
+    height: 90vh;
     aspect-ratio: 9 / 18;
     display: flex;
     flex-direction: column;
