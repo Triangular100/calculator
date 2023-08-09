@@ -274,6 +274,7 @@ function processKey(e) {
         (e.key === "-") ||
         (e.key === "+")) {
         appendOperator(e.key);
+        e.preventDefault(); // Prevent FireFox Quick Find
     } else if (e.key === "Enter") {
         calculate();
     } else if (e.key === ".") {
