@@ -148,7 +148,7 @@ function calculate() {
 }
 
 function truncate(expression) {
-    let limit = 15;
+    let limit = 14;
     if (expression.length < limit) {
         return expression;
     }
@@ -159,7 +159,7 @@ function truncate(expression) {
         return currentExpression;
     }
 
-    return currentExpression.substring(0, 15);
+    return currentExpression.substring(0, limit);
 }
 
 function addPeriod() {
